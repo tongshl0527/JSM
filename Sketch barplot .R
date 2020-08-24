@@ -18,25 +18,34 @@ dataset_event0 <- dataset[ which(dataset$OVERALL_SURVIVAL_EVENT=='0'),]
 barplot(dataset_event1, space = 0, border = NA ,yaxt = "n", col = "black",las=1,xaxt = "n")
 
 #I do not understand how these part of the code works 
-genelevel_data = list()
-survival_time = rnorm(1000, mean = 10, sd = 3)
-event = sample(c(0,1),1000, replace = TRUE)
-genelevel_data$survival_time = survival_time
+genelevel_data = list() #why do you have list() here? Or do you name an empty list?
+survival_time = rnorm(1000, mean = 10, sd = 3) #here you are generating a normal distribution? 
+# rnorm(n,mean,var): why do you make n=1000?
+event = sample(c(0,1),1000, replace = TRUE) #why do you generate a random sample here?
+genelevel_data$survival_time = survival_time 
+# Here you're referring to Item "survival_time" in genelevel_data list()
+# why do you define it a normal distribution object?
 genelevel_data$event = event
+#if i understand you correctly, you made an empty list 
+# first, you created event and survival_time items
+# second, you defined them by event and survival_time
 genelevel_data = as.data.frame(genelevel_data)
-
-
-sorted_vec = sort(genelevel_data[,1]
+#now you convert list(event,survival_time) to a dataframe?
+sorted_vec = sort(genelevel_data[,1]  # can you explain the use of [a,b]? Do you sort second column whose survival time is 1?
                   # , decreasing = TRUE
                   , index.return = TRUE)
-sorted_vec_v1  = sorted_vec$x
+
+sorted_vec_v1  = sorted_vec$x #here i am losed by Item x 
 sub_vec_index = which(genelevel_data$event==1)
 
+####################I am totally lost in this part######################
 sorted_vec_v2 = sorted_vec_v1
 
 sorted_vec_v2[which(sorted_vec$ix%in%sub_vec_index)] = 1
 
 sorted_vec_v2[which(!(sorted_vec$ix%in%sub_vec_index))] = 0
+########################################################################
+
 barplot(sorted_vec_v2
         , space = 0
         , border = NA
