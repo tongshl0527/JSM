@@ -4,6 +4,10 @@
 GEO_breast_cancer_OS_data <- read.delim("~/Documents/TTT-project Bioinformatics/GEO_breast_cancer_OS_data.txt")
 # descriptive statistics
 summary(GEO_breast_cancer_OS_data) 
+
+# check for every variable, how many missing values are there? Decide how to remove samples row by column.
+sum(is.na(data[,variable]))
+
 # Remove all missing data
 dataset <- na.omit(GEO_breast_cancer_OS_data) 
 #sort the order of survival years 
