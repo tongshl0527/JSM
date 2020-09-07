@@ -1,4 +1,5 @@
 library(ggplot2)
+library(tibble)
 
 GEO_breast_cancer_OS_data <- read.delim("~/Documents/TTT-project Bioinformatics/GEO_breast_cancer_OS_data.txt")
 GEO_breast_cancer_OS_data
@@ -8,52 +9,37 @@ summary(GEO_breast_cancer_OS_data)
 dataset <- na.omit(GEO_breast_cancer_OS_data) 
 #sort the order of survival years 
 dataset = dataset[order(dataset[,2]),] 
-dataset_event1 <- subset(dataset, )
+#dataset_event1 <- subset(dataset, )
 
-#barplot uses ggplot to show total events 
-ggplot(dataset,aes(x=dataset$OVERALL_SURVIVAL_TIME_YEARS,
-                                      y=dataset$OVERALL_SURVIVAL_EVENT))
-                                                          +geom_bar(stat="identity") 
-
-#subset dataset to event0 and event1 dataset
-dataset_event1 <- dataset[ which(dataset$OVERALL_SURVIVAL_EVENT=='1'),]
-dataset_event0 <- dataset[ which(dataset$OVERALL_SURVIVAL_EVENT=='0'),]
-dataset_event0
-
-# event 1 barplot 
-ggplot_dataset_event1 <- dataset_event1
-ggplot_dataset_event1$OVERALL_SURVIVAL_EVENT <- 1
-ggplot(ggplot_dataset_event1,aes(x=ggplot_dataset_event1$OVERALL_SURVIVAL_TIME_YEARS,
-                                 y=ggplot_dataset_event1$OVERALL_SURVIVAL_EVENT))
-                                  +geom_bar(stat="identity") 
-# event 0 barplot 
-ggplot_dataset_event0 <- dataset_event0
-ggplot_dataset_event0$OVERALL_SURVIVAL_EVENT <- 1
-ggplot(ggplot_dataset_event0,aes(x=ggplot_dataset_event0$OVERALL_SURVIVAL_TIME_YEARS,
-                                 y=ggplot_dataset_event0$OVERALL_SURVIVAL_EVENT))
-                                  +geom_bar(stat="identity") 
+# predifine color blind friendly colors in The palette with black:
+color_table <- tibble(Batch = c("GPL570_GSE16446", "GPL570_GSE20685", "GPL570_GSE20711", "GPL570_GSE42568", "GPL570_GSE48390", "GPL96_GSE1456", "GPL96_GSE3494", "GPL96_GSE45255", "GPL96_GSE4922","GPL96_GSE6532", "GPL96_GSE7390"),Color = c("yellow", "darkgreen", "blue4", "lightblue", "maroon3","orange","gray","lightsalmon","red","tan","peru"))
 
 
+dataset$BATCH <- factor(dataset$BATCH, levels = color_table$Batch)
+
+# All breast cancer patients event 1 #color=factor(dataset$BATCH) is removed
+All_plot <- ggplot(dataset,aes(x=rank(dataset$OVERALL_SURVIVAL_TIME_YEARS,ties.method = "random"), y=dataset$OVERALL_SURVIVAL_EVENT,fill=BATCH)) +geom_bar(stat="identity") 
+#remove background and axises + add axis titles
+All_plot <- All_plot + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank() ,axis.text.y=element_blank(),axis.ticks.y=element_blank()) + labs(x = "Survival Time", y = "Survival Event", title = "All survival Breast Cancer Patients")
+All_survival <- All_plot
+All_survival
+# width big and short height
 
 
-############################################Ignore from here#############################################
-#generate a list of indexes match to event 1
-Event1_index <- which(dataset$OVERALL_SURVIVAL_EVENT==1)
+# All breast cancer patients event 0
+# reverse event 0 to event 1
+event0 <- 1- dataset$OVERALL_SURVIVAL_EVENT
+All_dicease <- ggplot(dataset,aes(x=rank(dataset$OVERALL_SURVIVAL_TIME_YEARS,ties.method = "random"), y=event0, ,fill=BATCH)) +geom_bar(stat="identity") 
+#remove background and axises + add axis titles
+All_dicease <- All_dicease + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank() ,axis.text.y=element_blank(),axis.ticks.y=element_blank()) + labs(x = "Survival Time", y = "Survival Event", title = "All Diceased Breast Cancer Patients")
+All_dicease
 
-#define 
-sorted_vec = sort(dataset[,2], index.return = TRUE)
-sorted_vec
-sorted_vec_v1  = sorted_vec$x #here i am losed by Item x 
-sub_vec_index = which(dataset$event==1)
-sorted_vec_v2 = sorted_vec_v1
-#find %IN% table.
-#Find:The element(s) to look up in the vector or matrix. 
-#table:The vector or matrix in which to look up the element(s).
-sorted_vec_v2[which(sorted_vec$ix%in%sub_vec_index)] = 1
-sorted_vec_v2[which(!(sorted_vec$ix%in%sub_vec_index))] = 0
-sorted_vec_v2
-########################################################################################################
-barplot(dataset_event1$OVERALL_SURVIVAL_EVENT)
+#Export figures to pdf file 
+pdf(file = "/Users/shanlin/Documents/TTT-project Bioinformatics/survival.pdf",height = 4, width = 8)
+print(All_survival)
+dev.off()
 
-
+pdf(file = "/Users/shanlin/Documents/TTT-project Bioinformatics/diceased.pdf",height = 4, width = 8)
+print(All_dicease)
+dev.off()
 
